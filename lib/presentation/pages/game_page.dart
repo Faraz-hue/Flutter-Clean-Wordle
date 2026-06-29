@@ -1,21 +1,22 @@
-/*
- * @Author       : Linloir
- * @Date         : 2022-03-05 20:41:41
- * @LastEditTime : 2022-03-11 14:54:15
- * @Description  : Offline page
- */
+// ignore_for_file: sort_child_properties_last
 
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:wordle/event_bus.dart';
-import 'package:wordle/validation_provider.dart';
-import 'package:wordle/display_pannel.dart';
-import 'package:wordle/instruction_pannel.dart';
-import 'package:wordle/popper_generator.dart';
+import 'package:wordle/core/utils/event_bus.dart';
+import 'package:wordle/presentation/providers/validation_provider.dart';
+import 'package:wordle/presentation/widgets/display_pannel.dart';
+import 'package:wordle/presentation/widgets/instruction_pannel.dart';
+import 'package:wordle/presentation/widgets/popper_generator.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({Key? key, required this.database, required this.wordLen, required this.maxChances, required this.gameMode}) : super(key: key);
+  const GamePage(
+      {Key? key,
+      required this.database,
+      required this.wordLen,
+      required this.maxChances,
+      required this.gameMode})
+      : super(key: key);
 
   final Map<String, List<String>> database;
   final int wordLen;
@@ -26,19 +27,17 @@ class GamePage extends StatefulWidget {
   State<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
+class _GamePageState extends State<GamePage> with TickerProviderStateMixin {
   late AnimationController _controller;
 
   void _onGameEnd(dynamic args) {
     var result = args as bool;
-    if(result == true) {
+    if (result == true) {
       _controller.forward().then((v) {
         _controller.reset();
         mainBus.emit(event: "Result", args: result);
-      }
-      );
-    }
-    else {
+      });
+    } else {
       mainBus.emit(event: "Result", args: result);
     }
   }
@@ -46,7 +45,8 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 2000));
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2000));
     mainBus.onBus(event: "ValidationEnds", onEvent: _onGameEnd);
   }
 
@@ -64,18 +64,20 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
         Positioned.fill(
           child: Scaffold(
             appBar: AppBar(
-              backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey[850] : Colors.white,
+              backgroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.teal[900]
+                  : Colors.teal,
+              iconTheme: const IconThemeData(color: Colors.white),
               elevation: 0.0,
               shadowColor: Colors.transparent,
               toolbarHeight: 80.0,
-              titleTextStyle: TextStyle(
-                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[100] : Colors.black,
+              titleTextStyle: const TextStyle(
+                color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 20.0,
               ),
               title: const Text('WORDLE'),
               centerTitle: true,
-              //iconTheme: const IconThemeData(color: Colors.black),
               actions: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 750),
@@ -83,13 +85,18 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
                   switchInCurve: Curves.bounceOut,
                   switchOutCurve: Curves.bounceIn,
                   transitionBuilder: (child, animation) {
-                    var rotateAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(animation);
-                    var opacAnimation = Tween<double>(begin: 0, end: 1).animate(animation);
+                    var rotateAnimation =
+                        Tween<double>(begin: 0, end: 2 * pi).animate(animation);
+                    var opacAnimation =
+                        Tween<double>(begin: 0, end: 1).animate(animation);
                     return AnimatedBuilder(
                       animation: rotateAnimation,
                       builder: (context, child) {
                         return Transform(
-                          transform: Matrix4.rotationZ(rotateAnimation.status == AnimationStatus.reverse ? 2 * pi - rotateAnimation.value : rotateAnimation.value),
+                          transform: Matrix4.rotationZ(
+                              rotateAnimation.status == AnimationStatus.reverse
+                                  ? 2 * pi - rotateAnimation.value
+                                  : rotateAnimation.value),
                           alignment: Alignment.center,
                           child: Opacity(
                             opacity: opacAnimation.value,
@@ -102,21 +109,24 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
                   },
                   child: IconButton(
                     key: ValueKey(mode),
-                    icon: mode == Brightness.light ? const Icon(Icons.dark_mode_outlined) : const Icon(Icons.dark_mode),
-                    onPressed: () => mainBus.emit(event: "ToggleTheme", args: []),
+                    icon: mode == Brightness.light
+                        ? const Icon(Icons.dark_mode_outlined)
+                        : const Icon(Icons.dark_mode),
+                    onPressed: () =>
+                        mainBus.emit(event: "ToggleTheme", args: []),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.help_outline_outlined),
                   //color: Colors.black,
-                  onPressed: (){
+                  onPressed: () {
                     showInstructionDialog(context: context);
                   },
                 ),
                 IconButton(
                   icon: const Icon(Icons.refresh_rounded),
                   //color: Colors.black,
-                  onPressed: (){
+                  onPressed: () {
                     mainBus.emit(event: "NewGame", args: []);
                   },
                 ),
@@ -128,9 +138,12 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
                 wordLen: widget.wordLen,
                 maxChances: widget.maxChances,
                 gameMode: widget.gameMode,
-                child: WordleDisplayWidget(wordLen: widget.wordLen, maxChances: widget.maxChances),
+                child: WordleDisplayWidget(
+                    wordLen: widget.wordLen, maxChances: widget.maxChances),
               ),
-              color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[850] : Colors.white,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.grey[850]
+                  : Colors.white,
             ),
           ),
         ),
@@ -138,7 +151,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
           child: PartyPopperGenerator(
             direction: PopDirection.fowardX,
             motionCurveX: FunctionCurve(func: (t) {
-              return - t * t / 2 + t;
+              return -t * t / 2 + t;
             }),
             motionCurveY: FunctionCurve(func: (t) {
               return 4 / 3 * t * t - t / 3;
@@ -155,7 +168,7 @@ class _GamePageState extends State<GamePage> with TickerProviderStateMixin{
           child: PartyPopperGenerator(
             direction: PopDirection.backwardX,
             motionCurveX: FunctionCurve(func: (t) {
-              return - t * t / 2 + t;
+              return -t * t / 2 + t;
             }),
             motionCurveY: FunctionCurve(func: (t) {
               return 4 / 3 * t * t - t / 3;

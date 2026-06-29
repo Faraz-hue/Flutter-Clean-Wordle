@@ -1,12 +1,5 @@
-/*
- * @Author       : Linloir
- * @Date         : 2022-03-09 22:33:34
- * @LastEditTime : 2022-03-10 13:48:48
- * @Description  : 
- */
-
 import 'package:flutter/material.dart';
-import './group_shared.dart';
+import 'package:wordle/presentation/widgets/group_shared.dart';
 
 class SelectionGroupProvider extends StatefulWidget {
   const SelectionGroupProvider({
@@ -36,6 +29,7 @@ class _SelectionGroupProviderState extends State<SelectionGroupProvider> {
   @override
   Widget build(BuildContext context) {
     return GroupSharedData(
+      selected: selected,
       child: NotificationListener<SelectNotification>(
         child: widget.selections,
         onNotification: (noti) {
@@ -46,7 +40,6 @@ class _SelectionGroupProviderState extends State<SelectionGroupProvider> {
           return true;
         },
       ),
-      selected: selected,
     );
   }
 }

@@ -1,41 +1,36 @@
-/*
- * @Author       : Linloir
- * @Date         : 2022-03-05 20:21:34
- * @LastEditTime : 2022-03-14 18:01:15
- * @Description  : 
- */
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wordle/event_bus.dart';
-import 'package:wordle/loading_page.dart';
-import 'package:wordle/single_selection.dart';
-import 'package:wordle/selection_group.dart';
-import 'package:wordle/scroll_behav.dart';
+import 'package:wordle/core/utils/event_bus.dart';
+import 'package:wordle/presentation/pages/loading_page.dart';
+import 'package:wordle/presentation/widgets/single_selection.dart';
+import 'package:wordle/presentation/widgets/selection_group.dart';
+import 'package:wordle/core/utils/scroll_behav.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:wordle/instruction_pannel.dart';
+import 'package:wordle/presentation/widgets/instruction_pannel.dart';
 import 'dart:io';
 import 'dart:math';
 
 Future<void> loadSettings() async {
   Directory documentsDirectory = await getApplicationDocumentsDirectory();
   String documentsPath = documentsDirectory.path + Platform.pathSeparator;
-  File settings = File(documentsPath + "settings.txt");
-  if(!(await settings.exists())) {
+  File settings = File("${documentsPath}settings.txt");
+  if (!(await settings.exists())) {
     var defaultSettings = "5\nCET4\nLight";
     settings.writeAsString(defaultSettings);
   }
   List<String> dicBooks = ["validation.txt", "CET4.txt"];
-  for(String dicName in dicBooks) {
-    if(!(await File(documentsPath + dicName).exists())) {
+  for (String dicName in dicBooks) {
+    if (!(await File(documentsPath + dicName).exists())) {
       //Copy file
       ByteData data = await rootBundle.load("assets/CET4.txt");
-      List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      List<int> bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await File(documentsPath + dicName).writeAsBytes(bytes, flush: true);
     }
   }
 }
 
-void main(){
+void main() {
   runApp(const MyApp());
 }
 
@@ -47,28 +42,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   var brightness = Brightness.light;
 
   void _onThemeChange(dynamic args) {
     setState(() {
-      brightness = brightness == Brightness.light ? Brightness.dark : Brightness.light;
+      brightness =
+          brightness == Brightness.light ? Brightness.dark : Brightness.light;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    //loadSettings();
+    // loadSettings();
     mainBus.onBus(event: "ToggleTheme", onEvent: _onThemeChange);
   }
 
   @override
-  void dispose(){
+  void dispose() {
     mainBus.offBus(event: "ToggleTheme", callBack: _onThemeChange);
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -105,7 +100,7 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder(
       future: readSettings(),
       builder: (context, snapshot) {
-        if(snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.connectionState == ConnectionState.done) {
           var mode = Theme.of(context).brightness;
           return Scaffold(
             body: Align(
@@ -115,6 +110,11 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     Container(
+                      decoration: BoxDecoration(
+                        color: mode == Brightness.dark
+                            ? Colors.teal[900]
+                            : Colors.teal,
+                      ),
                       constraints: const BoxConstraints(minHeight: 100.0),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -122,56 +122,79 @@ class _HomePageState extends State<HomePage> {
                           Align(
                             alignment: Alignment.bottomLeft,
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 30.0, bottom: 10.0),
-                              child: Text('WORDLE', style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300, color: mode == Brightness.light ? Colors.grey[850]! : Colors.white)),
+                              padding: const EdgeInsets.only(
+                                  left: 30.0, bottom: 10.0),
+                              child: Text('WORDLE',
+                                  style: const TextStyle(
+                                      fontSize: 30.0,
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.white)),
                             ),
                           ),
                           const Spacer(),
                           Align(
                             alignment: Alignment.bottomRight,
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 30.0, bottom: 10.0),
-                              child: Row(
-                                children: [
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 750),
-                                    reverseDuration: const Duration(milliseconds: 750),
-                                    switchInCurve: Curves.bounceOut,
-                                    switchOutCurve: Curves.bounceIn,
-                                    transitionBuilder: (child, animation) {
-                                      var rotateAnimation = Tween<double>(begin: 0, end: 2 * pi).animate(animation);
-                                      var opacAnimation = Tween<double>(begin: 0, end: 1).animate(animation);
-                                      return AnimatedBuilder(
-                                        animation: rotateAnimation,
-                                        builder: (context, child) {
-                                          return Transform(
-                                            transform: Matrix4.rotationZ(rotateAnimation.status == AnimationStatus.reverse ? 2 * pi - rotateAnimation.value : rotateAnimation.value),
-                                            alignment: Alignment.center,
-                                            child: Opacity(
-                                              opacity: opacAnimation.value,
-                                              child: child,
-                                            ),
-                                          );
-                                        },
-                                        child: child,
-                                      );
-                                    },
-                                    child: IconButton(
-                                      key: ValueKey(mode),
-                                      icon: mode == Brightness.light ? const Icon(Icons.dark_mode_outlined) : const Icon(Icons.dark_mode),
-                                      onPressed: () => mainBus.emit(event: "ToggleTheme", args: []),
+                                padding: const EdgeInsets.only(
+                                    right: 30.0, bottom: 10.0),
+                                child: IconTheme(
+                                  data:
+                                      const IconThemeData(color: Colors.white),
+                                  child: Row(children: [
+                                    AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 750),
+                                      reverseDuration:
+                                          const Duration(milliseconds: 750),
+                                      switchInCurve: Curves.bounceOut,
+                                      switchOutCurve: Curves.bounceIn,
+                                      transitionBuilder: (child, animation) {
+                                        var rotateAnimation =
+                                            Tween<double>(begin: 0, end: 2 * pi)
+                                                .animate(animation);
+                                        var opacAnimation =
+                                            Tween<double>(begin: 0, end: 1)
+                                                .animate(animation);
+                                        return AnimatedBuilder(
+                                          animation: rotateAnimation,
+                                          builder: (context, child) {
+                                            return Transform(
+                                              transform: Matrix4.rotationZ(
+                                                  rotateAnimation.status ==
+                                                          AnimationStatus
+                                                              .reverse
+                                                      ? 2 * pi -
+                                                          rotateAnimation.value
+                                                      : rotateAnimation.value),
+                                              alignment: Alignment.center,
+                                              child: Opacity(
+                                                opacity: opacAnimation.value,
+                                                child: child,
+                                              ),
+                                            );
+                                          },
+                                          child: child,
+                                        );
+                                      },
+                                      child: IconButton(
+                                        key: ValueKey(mode),
+                                        icon: mode == Brightness.light
+                                            ? const Icon(
+                                                Icons.dark_mode_outlined)
+                                            : const Icon(Icons.dark_mode),
+                                        onPressed: () => mainBus.emit(
+                                            event: "ToggleTheme", args: []),
+                                      ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.help_outline_outlined),
-                                    //color: Colors.black,
-                                    onPressed: (){
-                                      showInstructionDialog(context: context);
-                                    },
-                                  ),
-                                ]
-                              )
-                            ),
+                                    IconButton(
+                                      icon: const Icon(
+                                          Icons.help_outline_outlined),
+                                      onPressed: () {
+                                        showInstructionDialog(context: context);
+                                      },
+                                    ),
+                                  ]),
+                                )),
                           )
                         ],
                       ),
@@ -187,8 +210,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           );
-        }
-        else {
+        } else {
           return const Text('');
         }
       },
@@ -207,22 +229,43 @@ class _OfflinePageState extends State<OfflinePage> {
   int wordLen = 5;
   int maxChances = 6;
   int dicBookIndex = 0;
-  var dicBook = [["All", "Full wordlist", "A", Colors.indigo], ["HighSchool", "HighSchool wordlist", "H", Colors.amber],
-                ["CET4", "CET4 wordlist", "4", Colors.green[400]], ["CET6", "CET6 wordlist", "6", Colors.teal[400]],
-                ["CET4 + 6", "CET4&6 wordlist", "46", Colors.teal[600]], ["TOEFL Slim", "TOEFL without CET4&6", "T", Colors.blue[400]],
-                ["TOEFL", "Full TOEFL wordlist", "T", Colors.cyan[400]], ["GRE Slim", "GRE without CET4&6", "G", Colors.pink[200]]];
+  var dicBook = [
+    ["All", "Full wordlist", "A", Colors.indigo],
+    ["HighSchool", "HighSchool wordlist", "H", Colors.amber],
+    ["CET4", "CET4 wordlist", "4", Colors.green[400]],
+    ["CET6", "CET6 wordlist", "6", Colors.teal[400]],
+    ["CET4 + 6", "CET4&6 wordlist", "46", Colors.teal[600]],
+    ["TOEFL Slim", "TOEFL without CET4&6", "T", Colors.blue[400]],
+    ["TOEFL", "Full TOEFL wordlist", "T", Colors.cyan[400]],
+    ["GRE Slim", "GRE without CET4&6", "G", Colors.pink[200]]
+  ];
   late final List<Widget> dicBookSelections;
-  var wordLenSelectionColors = [Colors.green[300], Colors.green[500], Colors.teal[300], Colors.teal[500], Colors.pink[300]];
-  var chancesSelectionColors = [Colors.deepOrange[600], Colors.orange[400], Colors.cyan, Colors.blue[400], Colors.blue[600], Colors.teal[400], Colors.teal[600], Colors.green[700]];
+  var wordLenSelectionColors = [
+    Colors.green[300],
+    Colors.green[500],
+    Colors.teal[300],
+    Colors.teal[500],
+    Colors.pink[300]
+  ];
+  var chancesSelectionColors = [
+    Colors.deepOrange[600],
+    Colors.orange[400],
+    Colors.cyan,
+    Colors.blue[400],
+    Colors.blue[600],
+    Colors.teal[400],
+    Colors.teal[600],
+    Colors.green[700]
+  ];
 
   @override
   void initState() {
     super.initState();
     dicBookSelections = [
-      for(int i = 0; i < dicBook.length; i++)
+      for (int i = 0; i < dicBook.length; i++)
         generateSelectionBox(
           id: i,
-          width: 190,
+          width: 200,
           height: 240,
           padding: const EdgeInsets.fromLTRB(15.0, 25.0, 15.0, 0.0),
           color: dicBook[i][3]! as Color,
@@ -236,8 +279,6 @@ class _OfflinePageState extends State<OfflinePage> {
     ];
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -249,14 +290,15 @@ class _OfflinePageState extends State<OfflinePage> {
           children: [
             Container(
               width: double.infinity,
-              height: 150.0,
               decoration: BoxDecoration(
-                color: wordLenSelectionColors[wordLen - 4]!.withOpacity(0.2),
+                color:
+                    wordLenSelectionColors[wordLen - 4]!.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10.0),
               ),
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(10.0),
-              margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -278,7 +320,7 @@ class _OfflinePageState extends State<OfflinePage> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          for(int i = 4; i <= 8; i++)
+                          for (int i = 4; i <= 8; i++)
                             generateSelectionBox(
                               id: i,
                               width: 80.0,
@@ -296,14 +338,15 @@ class _OfflinePageState extends State<OfflinePage> {
             ),
             Container(
               width: double.infinity,
-              height: 150.0,
               decoration: BoxDecoration(
-                color: chancesSelectionColors[maxChances - 1]!.withOpacity(0.2),
+                color: chancesSelectionColors[maxChances - 1]!
+                    .withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10.0),
               ),
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(10.0),
-              margin: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              margin:
+                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -325,7 +368,7 @@ class _OfflinePageState extends State<OfflinePage> {
                       scrollDirection: Axis.horizontal,
                       child: Row(
                         children: [
-                          for(int i = 1; i <= 8; i++)
+                          for (int i = 1; i <= 8; i++)
                             generateSelectionBox(
                               id: i,
                               width: 80.0,
@@ -344,7 +387,8 @@ class _OfflinePageState extends State<OfflinePage> {
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
-                color: (dicBook[dicBookIndex][3]! as Color).withOpacity(0.2),
+                color:
+                    (dicBook[dicBookIndex][3]! as Color).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10.0),
               ),
               margin: const EdgeInsets.all(10.0),
@@ -383,20 +427,26 @@ class _OfflinePageState extends State<OfflinePage> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.teal.withOpacity(0.2),
+                        color: Colors.teal.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                       margin: const EdgeInsets.all(10.0),
                       child: InkWell(
-                        onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                            return LoadingPage(dicName: dicBook[dicBookIndex][0] as String, wordLen: wordLen, maxChances: maxChances, gameMode: 0);
+                        onTap: () {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return LoadingPage(
+                                dicName: dicBook[dicBookIndex][0] as String,
+                                wordLen: wordLen,
+                                maxChances: maxChances,
+                                gameMode: 0);
                           }));
                         },
                         borderRadius: BorderRadius.circular(10.0),
                         child: Container(
                           alignment: Alignment.center,
-                          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 30.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30.0, vertical: 30.0),
                           child: const Text(
                             'Start Normal',
                             style: TextStyle(
@@ -409,31 +459,6 @@ class _OfflinePageState extends State<OfflinePage> {
                       ),
                     ),
                   ),
-                  // Expanded(
-                  //   child: Container(
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.pink[200]!.withOpacity(0.2),
-                  //       borderRadius: BorderRadius.circular(10.0),
-                  //     ),
-                  //     margin: const EdgeInsets.all(10.0),
-                  //     child: InkWell(
-                  //       onTap: (){},
-                  //       borderRadius: BorderRadius.circular(10.0),
-                  //       child: Container(
-                  //         alignment: Alignment.center,
-                  //         padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 30.0),
-                  //         child: Text(
-                  //           'Start Hard',
-                  //           style: TextStyle(
-                  //             fontSize: 22.0,
-                  //             fontWeight: FontWeight.bold,
-                  //             color: Colors.pink[400],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),

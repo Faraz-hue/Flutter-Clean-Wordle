@@ -1,9 +1,4 @@
-/*
- * @Author       : Linloir
- * @Date         : 2022-03-08 08:19:49
- * @LastEditTime : 2022-03-08 11:27:41
- * @Description  : Instruction dialog
- */
+// ignore_for_file: strict_top_level_inference
 
 import 'package:flutter/material.dart';
 
@@ -14,8 +9,12 @@ class DecoratedTitleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var mainTextColor = Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[850];
-    var mainDecorationColor = Theme.of(context).brightness == Brightness.dark ? Colors.white.withAlpha(100) : Colors.grey.withAlpha(100);
+    var mainTextColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.grey[850];
+    var mainDecorationColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white.withAlpha(100)
+        : Colors.grey.withAlpha(100);
     return SizedBox(
       height: 50.0,
       child: Stack(
@@ -54,7 +53,9 @@ class DecoratedPlainText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var mainTextColor = Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.grey[850];
+    var mainTextColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : Colors.grey[850];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Text(
@@ -69,24 +70,41 @@ class DecoratedPlainText extends StatelessWidget {
 }
 
 class DecoratedTextBox extends StatelessWidget {
-  const DecoratedTextBox({required this.letter, required this.state, Key? key}) : super(key: key);
+  const DecoratedTextBox({required this.letter, required this.state, Key? key})
+      : super(key: key);
 
   final String letter;
   final int state;
 
   @override
   Widget build(BuildContext context) {
-    var mainTextColor = Theme.of(context).brightness == Brightness.dark ? Colors.white : 
-                      state != 0 && state != 3 ? Colors.white : Colors.grey[850];
-    var backGroundColor = state == 1 ? Colors.green[600]! :
-                          state == 2 ? Colors.yellow[800]! :
-                          state == -1 ? Colors.grey[700]! :
-                          Theme.of(context).brightness == Brightness.dark ? Colors.grey[850]! : Colors.white;
-    var borderColor = state == 1 ? Colors.green[600]! :
-                      state == 2 ? Colors.yellow[800]! :
-                      state == 3 ? Theme.of(context).brightness == Brightness.dark ? Colors.grey[400]! : Colors.grey[850]! :
-                      state == -1 ? Colors.grey[700]! :
-                      Theme.of(context).brightness == Brightness.dark ? Colors.grey[700]! : Colors.grey[400]!;
+    var mainTextColor = Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : state != 0 && state != 3
+            ? Colors.white
+            : Colors.grey[850];
+    var backGroundColor = state == 1
+        ? Colors.green[600]!
+        : state == 2
+            ? Colors.yellow[800]!
+            : state == -1
+                ? Colors.grey[700]!
+                : Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[850]!
+                    : Colors.white;
+    var borderColor = state == 1
+        ? Colors.green[600]!
+        : state == 2
+            ? Colors.yellow[800]!
+            : state == 3
+                ? Theme.of(context).brightness == Brightness.dark
+                    ? Colors.grey[400]!
+                    : Colors.grey[850]!
+                : state == -1
+                    ? Colors.grey[700]!
+                    : Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey[700]!
+                        : Colors.grey[400]!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 1.0),
       child: Container(
@@ -119,50 +137,55 @@ Future<void> showInstructionDialog({required context}) {
     context: context,
     pageBuilder: (context, animation, secondaryAnimation) {
       return SafeArea(
-        child: Builder(
-          builder: (context) {
-            return Dialog(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
-                      child: Text(
-                        'How To Play',
-                        style: TextStyle(
-                          fontSize: 20.0,
-                        ),
+        child: Builder(builder: (context) {
+          return Dialog(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 10.0),
+                    child: Text(
+                      'How To Play',
+                      style: TextStyle(
+                        fontSize: 20.0,
                       ),
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                      margin: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 20.0),
-                      alignment: Alignment.center,
-                      child: SingleChildScrollView(
-                        child: Column(
+                ),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 20.0),
+                    alignment: Alignment.center,
+                    child: SingleChildScrollView(
+                      child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             //# AIM OF THE GAME
-                            const DecoratedTitleWidget(title: "Aim Of The Game"),
+                            const DecoratedTitleWidget(
+                                title: "Aim Of The Game"),
                             //Content of # AIM OF THE GAME
                             const DecoratedPlainText(
-                              text: "The aim of the WORDLE game is to guess a word within six tries.",
+                              text:
+                                  "The aim of the WORDLE game is to guess a word within six tries.",
                             ),
                             // const DecoratedPlainText(
                             //   text: "By default, the hidden word is five characters long.",
                             // ),
                             const DecoratedPlainText(
-                              text: "Each guess should be a valid word which matches the length of the hidden word, length of which by default is five characters long.",
+                              text:
+                                  "Each guess should be a valid word which matches the length of the hidden word, length of which by default is five characters long.",
                             ),
                             const DecoratedPlainText(
-                              text: "After each guess, the color of the tiles will change to infer how close your answer is to the word. The meaning of the colors is shown below.",
+                              text:
+                                  "After each guess, the color of the tiles will change to infer how close your answer is to the word. The meaning of the colors is shown below.",
                             ),
-                            const DecoratedTitleWidget(title: "Read The Colors"),
+                            const DecoratedTitleWidget(
+                                title: "Read The Colors"),
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 10.0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: const [
@@ -175,7 +198,8 @@ Future<void> showInstructionDialog({required context}) {
                               ),
                             ),
                             const DecoratedPlainText(
-                              text: "The green tile shows that letter B is in the word and it's in the right spot.",
+                              text:
+                                  "The green tile shows that letter B is in the word and it's in the right spot.",
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -187,7 +211,8 @@ Future<void> showInstructionDialog({required context}) {
                               ],
                             ),
                             const DecoratedPlainText(
-                              text: "The yellow tile shows that letter Y is in the word but it's not in the right spot.",
+                              text:
+                                  "The yellow tile shows that letter Y is in the word but it's not in the right spot.",
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -199,53 +224,52 @@ Future<void> showInstructionDialog({required context}) {
                               ],
                             ),
                             const DecoratedPlainText(
-                              text: "A grey tile shows the letter is not in the word. For example, O, P, S are not in the word.",
+                              text:
+                                  "A grey tile shows the letter is not in the word. For example, O, P, S are not in the word.",
                             ),
-                          ]
-                        ),
-                      ),
+                          ]),
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: TextButton(
-                        child: Text('Got it!', style: TextStyle(color: Colors.grey[850]),),
-                        onPressed: () => Navigator.of(context).pop(),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: TextButton(
+                      child: Text(
+                        'Got it!',
+                        style: TextStyle(color: Colors.grey[850]),
                       ),
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
-                  )
-                ],
-              ),
-            );
-          }
-        ),
+                  ),
+                )
+              ],
+            ),
+          );
+        }),
       );
     },
     transitionBuilder: (context, animation, secondaryAnimation, child) {
-      var scaleAnimation = Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(
-          parent: animation, 
-          curve: Curves.easeOutExpo,
-        )
-      );
-      var opacAnimation = Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(
-          parent: animation, 
-          curve: Curves.easeOut,
-        )
-      );
+      var scaleAnimation =
+          Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutExpo,
+      ));
+      var opacAnimation =
+          Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOut,
+      ));
       return AnimatedBuilder(
         animation: animation,
         builder: (context, child) {
           return Opacity(
-            opacity: opacAnimation.value,
-            child: Transform.scale(
-              scale: scaleAnimation.value,
-              child: child,
-            )
-          );
+              opacity: opacAnimation.value,
+              child: Transform.scale(
+                scale: scaleAnimation.value,
+                child: child,
+              ));
         },
         child: child,
       );
